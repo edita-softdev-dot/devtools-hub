@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from '@elastic/elasticsearch';
-import type { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 
 @Injectable()
 export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
@@ -56,11 +55,14 @@ export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
 
   async ensureIndex(
     index: string,
-    mappings?: MappingTypeMapping,
+    mappings?: Record<string, any>,
   ): Promise<void> {
     const exists = await this.client.indices.exists({ index });
     if (!exists) {
-      await this.client.indices.create({ index, mappings });
+      await this.client.indices.create({
+        index,
+        body: mappings ? { mappings } : undefined,
+      });
       this.logger.log(`Created index: ${index}`);
     }
   }

@@ -1,5 +1,4 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import type { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { ElasticsearchService } from '../elasticsearch';
 
 export interface User {
@@ -14,14 +13,14 @@ export interface User {
 
 const INDEX = 'devtools-users';
 
-const MAPPINGS: MappingTypeMapping = {
+const MAPPINGS = {
   properties: {
-    email: { type: 'keyword' },
-    password: { type: 'keyword', index: false },
-    name: { type: 'text' },
-    role: { type: 'keyword' },
-    createdAt: { type: 'date' },
-    updatedAt: { type: 'date' },
+    email: { type: 'keyword' as const },
+    password: { type: 'keyword' as const, index: false },
+    name: { type: 'text' as const },
+    role: { type: 'keyword' as const },
+    createdAt: { type: 'date' as const },
+    updatedAt: { type: 'date' as const },
   },
 };
 
@@ -39,7 +38,7 @@ export class UsersRepository implements OnModuleInit {
   async findByEmail(email: string): Promise<User | null> {
     const result = await this.es.getClient().search<Omit<User, 'id'>>({
       index: INDEX,
-      query: { term: { email } },
+      body: { query: { term: { email } } },
     });
 
     const hit = result.hits.hits[0];
@@ -70,7 +69,7 @@ export class UsersRepository implements OnModuleInit {
 
     const result = await this.es.getClient().index({
       index: INDEX,
-      document,
+      body: document,
       refresh: 'wait_for',
     });
 

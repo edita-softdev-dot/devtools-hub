@@ -1,5 +1,4 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import type { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { ElasticsearchService } from '../elasticsearch';
 
 export interface Link {
@@ -20,20 +19,20 @@ export interface Link {
 
 const INDEX = 'devtools-links';
 
-const MAPPINGS: MappingTypeMapping = {
+const MAPPINGS = {
   properties: {
-    title: { type: 'text', fields: { keyword: { type: 'keyword' } } },
-    url: { type: 'keyword' },
-    description: { type: 'text' },
-    icon: { type: 'keyword' },
-    category: { type: 'keyword' },
-    sortOrder: { type: 'integer' },
-    isActive: { type: 'boolean' },
-    tags: { type: 'keyword' },
-    environment: { type: 'keyword' },
-    createdAt: { type: 'date' },
-    updatedAt: { type: 'date' },
-    createdBy: { type: 'keyword' },
+    title: { type: 'text' as const, fields: { keyword: { type: 'keyword' as const } } },
+    url: { type: 'keyword' as const },
+    description: { type: 'text' as const },
+    icon: { type: 'keyword' as const },
+    category: { type: 'keyword' as const },
+    sortOrder: { type: 'integer' as const },
+    isActive: { type: 'boolean' as const },
+    tags: { type: 'keyword' as const },
+    environment: { type: 'keyword' as const },
+    createdAt: { type: 'date' as const },
+    updatedAt: { type: 'date' as const },
+    createdBy: { type: 'keyword' as const },
   },
 };
 
@@ -53,16 +52,15 @@ export class LinksRepository implements OnModuleInit {
   async findAll(activeOnly = false): Promise<Link[]> {
     const query = activeOnly
       ? { bool: { filter: [{ term: { isActive: true } }] } }
-      : { match_all: {} as Record<string, never> };
+      : { match_all: {} };
 
     const result = await this.es.getClient().search<LinkDocument>({
       index: INDEX,
-      query,
-      sort: [
-        { category: { order: 'asc' } },
-        { sortOrder: { order: 'asc' } },
-      ],
-      size: 1000,
+      body: {
+        query,
+        sort: [{ category: 'asc' }, { sortOrder: 'asc' }],
+        size: 1000,
+      },
     });
 
     return result.hits.hits
@@ -90,7 +88,7 @@ export class LinksRepository implements OnModuleInit {
 
     const result = await this.es.getClient().index({
       index: INDEX,
-      document,
+      body: document,
       refresh: 'wait_for',
     });
 
@@ -102,7 +100,7 @@ export class LinksRepository implements OnModuleInit {
       await this.es.getClient().update({
         index: INDEX,
         id,
-        doc: { ...data, updatedAt: new Date().toISOString() },
+        body: { doc: { ...data, updatedAt: new Date().toISOString() } },
         refresh: 'wait_for',
       });
 
