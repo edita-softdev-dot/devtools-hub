@@ -10,12 +10,18 @@ function getHeaders(auth = false): HeadersInit {
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+    throw new Error('Session expired');
+  }
+
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Request failed' }));
     throw new Error(error.message ?? `HTTP ${response.status}`);
   }
   if (response.status === 204) return undefined as T;
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
 export function useApi() {

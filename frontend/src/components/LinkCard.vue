@@ -1,14 +1,24 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Link } from '../types/link';
 import DynamicIcon from './DynamicIcon.vue';
 import { ExternalLink } from 'lucide-vue-next';
 
-defineProps<{ link: Link }>();
+const props = defineProps<{ link: Link }>();
+
+const safeUrl = computed(() => {
+  try {
+    const url = new URL(props.link.url);
+    return ['http:', 'https:'].includes(url.protocol) ? props.link.url : '#';
+  } catch {
+    return '#';
+  }
+});
 </script>
 
 <template>
   <a
-    :href="link.url"
+    :href="safeUrl"
     target="_blank"
     rel="noopener noreferrer"
     class="link-card"

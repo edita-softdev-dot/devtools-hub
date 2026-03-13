@@ -37,6 +37,18 @@ watch(
         tags: [...(link.tags ?? [])],
         environment: link.environment ?? '',
       });
+    } else {
+      Object.assign(form, {
+        title: '',
+        url: '',
+        description: '',
+        icon: '',
+        category: '',
+        sortOrder: 0,
+        isActive: true,
+        tags: [],
+        environment: '',
+      });
     }
   },
   { immediate: true },

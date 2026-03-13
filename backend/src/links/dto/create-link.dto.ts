@@ -3,22 +3,28 @@ import {
   IsArray,
   IsBoolean,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   IsUrl,
+  Matches,
   Min,
 } from 'class-validator';
 
 export class CreateLinkDto {
   @ApiProperty({ example: 'Grafana', description: 'Display title of the link' })
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @ApiProperty({
     example: 'https://grafana.internal.io',
-    description: 'Target URL',
+    description: 'Target URL (must use http or https)',
   })
-  @IsUrl({ require_tld: false })
+  @IsUrl({ require_tld: false, protocols: ['http', 'https'] })
+  @Matches(/^https?:\/\//, {
+    message: 'URL must start with http:// or https://',
+  })
   url: string;
 
   @ApiPropertyOptional({
