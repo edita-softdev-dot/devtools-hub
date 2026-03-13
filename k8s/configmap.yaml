@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: devtools-hub-config
+  namespace: devtools-hub
+  labels:
+    app.kubernetes.io/part-of: devtools-hub
+data:
+  ELASTICSEARCH_NODE: "http://elasticsearch:9200"
+  JWT_EXPIRES_IN: "24h"
+  CORS_ORIGIN: "http://localhost:8080"
+  PORT: "3000"
+  ADMIN_EMAIL: "admin@devtools.local"
