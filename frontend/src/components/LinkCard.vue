@@ -19,6 +19,9 @@ defineProps<{ link: Link }>();
     <div class="link-card__body">
       <div class="link-card__header">
         <h3 class="link-card__title">{{ link.title }}</h3>
+        <span v-if="link.environment" class="link-card__env" :class="`link-card__env--${link.environment}`">
+          {{ link.environment }}
+        </span>
         <ExternalLink :size="14" class="link-card__external" />
       </div>
       <p v-if="link.description" class="link-card__description">
@@ -114,5 +117,30 @@ defineProps<{ link: Link }>();
   border-radius: 999px;
   font-weight: 500;
   text-transform: lowercase;
+}
+
+.link-card__env {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.link-card__env--production {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.link-card__env--staging {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.link-card__env--development {
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 </style>

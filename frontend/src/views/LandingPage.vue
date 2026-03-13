@@ -115,6 +115,10 @@ onMounted(fetchPublicLinks);
         </div>
       </section>
     </main>
+
+    <footer class="footer">
+      DevTools Hub &middot; {{ links.length }} tools available
+    </footer>
   </div>
 </template>
 
