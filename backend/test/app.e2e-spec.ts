@@ -94,8 +94,9 @@ describe('App (e2e)', () => {
         .get('/api/health')
         .expect(200)
         .expect((res) => {
-          expect(res.body.status).toBe('ok');
-          expect(res.body.timestamp).toBeDefined();
+          const body = res.body as { status: string; timestamp: string };
+          expect(body.status).toBe('ok');
+          expect(body.timestamp).toBeDefined();
         });
     });
 
@@ -104,8 +105,12 @@ describe('App (e2e)', () => {
         .get('/api/health/ready')
         .expect(200)
         .expect((res) => {
-          expect(res.body.status).toBe('ok');
-          expect(res.body.checks.elasticsearch).toBe('connected');
+          const body = res.body as {
+            status: string;
+            checks: { elasticsearch: string };
+          };
+          expect(body.status).toBe('ok');
+          expect(body.checks.elasticsearch).toBe('connected');
         });
     });
   });
@@ -116,8 +121,9 @@ describe('App (e2e)', () => {
         .get('/api/links')
         .expect(200)
         .expect((res) => {
-          expect(Array.isArray(res.body)).toBe(true);
-          expect(res.body[0].title).toBe('Grafana');
+          const body = res.body as Array<{ title: string }>;
+          expect(Array.isArray(body)).toBe(true);
+          expect(body[0].title).toBe('Grafana');
         });
     });
   });
@@ -129,7 +135,8 @@ describe('App (e2e)', () => {
         .send({ email: 'admin@devtools.local', password: 'admin123' })
         .expect(201)
         .expect((res) => {
-          expect(res.body.accessToken).toBeDefined();
+          const body = res.body as { accessToken: string };
+          expect(body.accessToken).toBeDefined();
         });
     });
 
@@ -150,9 +157,7 @@ describe('App (e2e)', () => {
     });
 
     it('GET /api/links/admin should require authentication', () => {
-      return request(app.getHttpServer())
-        .get('/api/links/admin')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/links/admin').expect(401);
     });
   });
 });

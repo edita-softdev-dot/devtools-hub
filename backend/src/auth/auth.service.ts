@@ -34,7 +34,8 @@ export class AuthService {
     const user = await this.usersService.findById(userId);
     if (!user) throw new UnauthorizedException();
 
-    const { password: _, ...profile } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...profile } = user;
     return profile;
   }
 }

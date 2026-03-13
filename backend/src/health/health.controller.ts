@@ -11,7 +11,7 @@ export class HealthController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Liveness probe' })
-  async liveness() {
+  liveness() {
     return { status: 'ok', timestamp: new Date().toISOString() };
   }
 

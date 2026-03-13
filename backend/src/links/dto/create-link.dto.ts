@@ -44,13 +44,19 @@ export class CreateLinkDto {
   @IsOptional()
   category?: string;
 
-  @ApiPropertyOptional({ example: 0, description: 'Sort position within category' })
+  @ApiPropertyOptional({
+    example: 0,
+    description: 'Sort position within category',
+  })
   @IsInt()
   @Min(0)
   @IsOptional()
   sortOrder?: number;
 
-  @ApiPropertyOptional({ example: true, description: 'Whether the link is visible' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Whether the link is visible',
+  })
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;

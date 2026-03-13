@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { LinksService } from './links.service';
 import { LinksRepository, Link } from './links.repository';
+import { CreateLinkDto } from './dto/create-link.dto';
 
 const mockLink: Link = {
   id: 'test-id-1',
@@ -118,12 +120,12 @@ describe('LinksService', () => {
     it('should apply defaults for optional fields', async () => {
       repository.create.mockResolvedValue(mockLink);
 
-      const dto = {
+      const dto: CreateLinkDto = {
         title: 'Minimal Link',
         url: 'https://example.com',
       };
 
-      await service.createLink(dto as any, 'user-1');
+      await service.createLink(dto, 'user-1');
 
       expect(repository.create).toHaveBeenCalledWith(
         expect.objectContaining({

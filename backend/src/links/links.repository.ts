@@ -21,7 +21,10 @@ const INDEX = 'devtools-links';
 
 const MAPPINGS = {
   properties: {
-    title: { type: 'text' as const, fields: { keyword: { type: 'keyword' as const } } },
+    title: {
+      type: 'text' as const,
+      fields: { keyword: { type: 'keyword' as const } },
+    },
     url: { type: 'keyword' as const },
     description: { type: 'text' as const },
     icon: { type: 'keyword' as const },
@@ -76,13 +79,15 @@ export class LinksRepository implements OnModuleInit {
       });
       if (!result._source) return null;
       return { id: result._id, ...result._source };
-    } catch (error: any) {
-      if (error?.meta?.statusCode === 404) return null;
+    } catch (error: unknown) {
+      if (this.isNotFound(error)) return null;
       throw error;
     }
   }
 
-  async create(data: Omit<Link, 'id' | 'createdAt' | 'updatedAt'>): Promise<Link> {
+  async create(
+    data: Omit<Link, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Link> {
     const now = new Date().toISOString();
     const document: LinkDocument = { ...data, createdAt: now, updatedAt: now };
 
@@ -95,7 +100,10 @@ export class LinksRepository implements OnModuleInit {
     return { id: result._id, ...document };
   }
 
-  async update(id: string, data: Partial<Omit<Link, 'id' | 'createdAt'>>): Promise<Link | null> {
+  async update(
+    id: string,
+    data: Partial<Omit<Link, 'id' | 'createdAt'>>,
+  ): Promise<Link | null> {
     try {
       await this.es.getClient().update({
         index: INDEX,
@@ -105,8 +113,8 @@ export class LinksRepository implements OnModuleInit {
       });
 
       return this.findById(id);
-    } catch (error: any) {
-      if (error?.meta?.statusCode === 404) return null;
+    } catch (error: unknown) {
+      if (this.isNotFound(error)) return null;
       throw error;
     }
   }
@@ -119,8 +127,8 @@ export class LinksRepository implements OnModuleInit {
         refresh: 'wait_for',
       });
       return true;
-    } catch (error: any) {
-      if (error?.meta?.statusCode === 404) return false;
+    } catch (error: unknown) {
+      if (this.isNotFound(error)) return false;
       throw error;
     }
   }
@@ -128,5 +136,15 @@ export class LinksRepository implements OnModuleInit {
   async count(): Promise<number> {
     const result = await this.es.getClient().count({ index: INDEX });
     return result.count;
+  }
+
+  private isNotFound(error: unknown): boolean {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'meta' in error &&
+      typeof (error as { meta: unknown }).meta === 'object' &&
+      (error as { meta: { statusCode?: number } }).meta?.statusCode === 404
+    );
   }
 }

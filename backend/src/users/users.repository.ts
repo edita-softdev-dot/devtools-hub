@@ -55,8 +55,8 @@ export class UsersRepository implements OnModuleInit {
       });
       if (!result._source) return null;
       return { id: result._id, ...result._source };
-    } catch (error: any) {
-      if (error?.meta?.statusCode === 404) return null;
+    } catch (error: unknown) {
+      if (this.isNotFound(error)) return null;
       throw error;
     }
   }
@@ -79,5 +79,15 @@ export class UsersRepository implements OnModuleInit {
   async count(): Promise<number> {
     const result = await this.es.getClient().count({ index: INDEX });
     return result.count;
+  }
+
+  private isNotFound(error: unknown): boolean {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'meta' in error &&
+      typeof (error as { meta: unknown }).meta === 'object' &&
+      (error as { meta: { statusCode?: number } }).meta?.statusCode === 404
+    );
   }
 }

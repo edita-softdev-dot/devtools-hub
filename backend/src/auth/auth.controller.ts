@@ -5,9 +5,14 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { LoginDto } from './dto/login.dto';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: { id: string; email: string; role: string };
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -27,7 +32,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'Returns user profile' })
-  async getProfile(@Request() req: any) {
+  async getProfile(@Request() req: AuthenticatedRequest) {
     return this.authService.getProfile(req.user.id);
   }
 }

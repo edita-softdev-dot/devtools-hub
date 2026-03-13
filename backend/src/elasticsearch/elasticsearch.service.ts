@@ -17,8 +17,7 @@ export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
     const username = this.configService.get<string>('elasticsearch.username');
     const password = this.configService.get<string>('elasticsearch.password');
 
-    const auth =
-      username && password ? { username, password } : undefined;
+    const auth = username && password ? { username, password } : undefined;
 
     this.client = new Client({ node, auth });
   }

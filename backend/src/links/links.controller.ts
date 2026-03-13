@@ -16,10 +16,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request as ExpressRequest } from 'express';
 import { Public } from '../auth/decorators/public.decorator';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { UpdateLinkDto } from './dto/update-link.dto';
 import { LinksService } from './links.service';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: { id: string; email: string; role: string };
+}
 
 @ApiTags('Links')
 @Controller('links')
@@ -29,7 +34,10 @@ export class LinksController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all active links (public)' })
-  @ApiResponse({ status: 200, description: 'Returns active links grouped by category' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns active links grouped by category',
+  })
   async getPublicLinks() {
     return this.linksService.getPublicLinks();
   }
@@ -55,7 +63,10 @@ export class LinksController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new link' })
   @ApiResponse({ status: 201, description: 'Link created successfully' })
-  async createLink(@Body() dto: CreateLinkDto, @Request() req: any) {
+  async createLink(
+    @Body() dto: CreateLinkDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
     return this.linksService.createLink(dto, req.user.id);
   }
 

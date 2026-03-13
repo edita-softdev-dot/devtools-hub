@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -19,7 +20,6 @@ const mockUser: User = {
 describe('UsersService', () => {
   let service: UsersService;
   let repository: jest.Mocked<UsersRepository>;
-  let configService: jest.Mocked<ConfigService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -51,7 +51,6 @@ describe('UsersService', () => {
 
     service = module.get<UsersService>(UsersService);
     repository = module.get(UsersRepository);
-    configService = module.get(ConfigService);
   });
 
   it('should be defined', () => {
