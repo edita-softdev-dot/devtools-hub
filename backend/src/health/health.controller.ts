@@ -1,6 +1,11 @@
-import { Controller, Get, HttpCode, HttpStatus, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
 import { Public } from '../auth/decorators/public.decorator';
 import { ElasticsearchService } from '../elasticsearch';
 
@@ -20,19 +25,20 @@ export class HealthController {
   @Public()
   @Get('ready')
   @ApiOperation({ summary: 'Readiness probe (checks ElasticSearch)' })
-  async readiness(@Res({ passthrough: true }) res: Response) {
+  async readiness() {
     const esHealthy = await this.es.isHealthy();
-
-    if (!esHealthy) {
-      res.status(HttpStatus.SERVICE_UNAVAILABLE);
-    }
-
-    return {
+    const body = {
       status: esHealthy ? 'ok' : 'degraded',
       timestamp: new Date().toISOString(),
       checks: {
         elasticsearch: esHealthy ? 'connected' : 'disconnected',
       },
     };
+
+    if (!esHealthy) {
+      throw new HttpException(body, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    return body;
   }
 }
